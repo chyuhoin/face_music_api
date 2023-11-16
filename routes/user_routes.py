@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, g
 
-user_routes = Blueprint('api_routes', __name__)
+user_routes = Blueprint('user', __name__)
 
 @user_routes.route('/user/info/<id>', methods=['GET'])
 def info(id):
