@@ -1,18 +1,14 @@
-from flask import Flask
-from flask_cors import CORS
-from utils.database import init_db
-from routes.user_routes import user_routes
-from routes.photo_routes import photo_routes
+from config import app, db
+from routes.user_routes import UserRegistration, UserLogin, UserResource
+from flask_restful import Api
 
-app = Flask(__name__)
-cors = CORS(app)
-init_db(app)
+api = Api(app)
 
-app.config['DATABASE_HOST'] = '159.138.245.76'
-app.config['DATABASE_PORT'] = 5432
-app.config['DATABASE_NAME'] = 'music'
-app.config['DATABASE_USER'] = 'root'
-app.config['DATABASE_PASSWORD'] = 'SEU.software@music##'
+# 添加资源到API
+api.add_resource(UserRegistration, '/registration')
+api.add_resource(UserLogin, '/login')
+api.add_resource(UserResource, '/user')
 
-app.register_blueprint(user_routes)
-app.register_blueprint(photo_routes)
+if __name__ == '__main__':
+    db.create_all()
+    app.run()
