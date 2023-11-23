@@ -17,6 +17,21 @@ user_fields = {
     'uid': fields.String
 }
 
+
+def get_args(parser, is_new: bool):
+    parser.add_argument('phone', type=str, required=is_new)
+    parser.add_argument('password', type=str, required=is_new)
+    parser.add_argument('nickname', type=str)
+    parser.add_argument('age', type=int)
+    parser.add_argument('gender', type=bool)
+    parser.add_argument('address', type=str)
+    parser.add_argument('style', type=str)
+    parser.add_argument('emotion', type=int)
+    parser.add_argument('level', type=bool)
+    parser.add_argument('uid', type=str, required=is_new)
+    return parser.parse_args()
+
+
 class UserResource(Resource):
     @marshal_with(user_fields)
     def get(self, user_id):
@@ -26,17 +41,7 @@ class UserResource(Resource):
     @marshal_with(user_fields)
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('phone', type=str, required=True)
-        parser.add_argument('password', type=str, required=True)
-        parser.add_argument('nickname', type=str)
-        parser.add_argument('age', type=int)
-        parser.add_argument('gender', type=bool)
-        parser.add_argument('address', type=str)
-        parser.add_argument('style', type=str)
-        parser.add_argument('emotion', type=int)
-        parser.add_argument('level', type=bool)
-        parser.add_argument('uid', type=str, required=True)
-        args = parser.parse_args()
+        args = get_args(parser, True)
 
         user = User(**args)
         db.session.add(user)
@@ -47,17 +52,7 @@ class UserResource(Resource):
     def put(self, user_id):
         user = User.query.get_or_404(user_id)
         parser = reqparse.RequestParser()
-        parser.add_argument('phone', type=str)
-        parser.add_argument('password', type=str)
-        parser.add_argument('nickname', type=str)
-        parser.add_argument('age', type=int)
-        parser.add_argument('gender', type=bool)
-        parser.add_argument('address', type=str)
-        parser.add_argument('style', type=str)
-        parser.add_argument('emotion', type=int)
-        parser.add_argument('level', type=bool)
-        parser.add_argument('uid', type=str)
-        args = parser.parse_args()
+        args = get_args(parser, False)
 
         for key, value in args.items():
             if value is not None:
@@ -72,9 +67,18 @@ class UserResource(Resource):
         db.session.commit()
         return '', 204
 
+
 class UserRegistration(Resource):
+    @marshal_with(user_fields)
     def post(self):
-        return UserResource.post()
+        parser = reqparse.RequestParser()
+        args = get_args(parser, True)
+
+        user = User(**args)
+        db.session.add(user)
+        db.session.commit()
+        return user, 201
+
 
 class UserLogin(Resource):
     def post(self):
@@ -85,10 +89,10 @@ class UserLogin(Resource):
 
         current_user = User.query.filter_by(phone=data['phone']).first()
         if not current_user:
-            return {'message': 'User {} doesn\'t exist'.format(data['phone'])}
+            return {'message': 'User {} doesn\'t exist'.format(data['id'])}
 
         if data['password'] == current_user.password:
-            access_token = create_access_token(identity=data['phone'])
+            access_token = create_access_token(identity=current_user.id)
             return {
                 'message': 'Logged in as {}'.format(current_user.phone),
                 'access_token': access_token
