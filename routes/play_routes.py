@@ -1,8 +1,12 @@
 import json
+import math
+import random
+
 from flask_restful import Resource, reqparse, fields, marshal_with
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from config import app, db
 from models.play import Play
+from models.music import Music
 from sqlalchemy import func
 
 play_field = {
@@ -42,9 +46,37 @@ class PlayResource(Resource):
         return play, 201
 
 
+def clac_similarity(user_emotion, music_emotion):
+    point = 0
+    for key in user_emotion.keys():
+        point += user_emotion[key] * music_emotion[key]
+    user_norm = 0
+    for value in user_emotion.values():
+        user_norm += value * value
+    music_norm = 0
+    for value in music_emotion.values():
+        music_norm += value * value
+    return point / math.sqrt(user_norm * music_norm)
+
+
 class Recommend(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('emotion', type=str, required=True, help='Where is your emotion?')
-    args = parser.parse_args()
-    emotion = json.loads(args['emotion'])
-    # TODO: 方法一：记录每首歌的七维情感倾向，使用余弦相似度进行推荐； 方法二：记录每首歌的具体情感，选取最高的进行推荐
+
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('emotion', type=str, required=True, help='Where is your emotion?')
+        args = parser.parse_args()
+        emotion = json.loads(args['emotion'])
+
+        # 记录每首歌的七维情感倾向，使用余弦相似度进行推荐
+        all_music = Music.query().all()
+        best_music = []
+
+        for music in all_music:
+            music_emotion = json.loads(music.emotion)
+            best_music.append((clac_similarity(emotion, music_emotion), music))
+
+        sorted(best_music, key=lambda x: x[0], reverse=True)
+        upper = max(len(best_music) // 10, 1)
+        choice = random.randint(0, upper)
+        return best_music[choice][1].id
