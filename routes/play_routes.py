@@ -69,7 +69,7 @@ class Recommend(Resource):
         emotion = json.loads(args['emotion'])
 
         # 记录每首歌的七维情感倾向，使用余弦相似度进行推荐
-        all_music = Music.query().all()
+        all_music = Music.query.all()
         best_music = []
 
         for music in all_music:
@@ -79,4 +79,4 @@ class Recommend(Resource):
         sorted(best_music, key=lambda x: x[0], reverse=True)
         upper = max(len(best_music) // 10, 1)
         choice = random.randint(0, upper)
-        return best_music[choice][1].id
+        return {"recommend": best_music[choice][1].id}

@@ -1,7 +1,7 @@
 from config import app, db
 from routes.user_routes import UserRegistration, UserLogin, UserResource
 from routes.face_routes import FaceResource, FaceExamine
-from routes.music_routes import MusicResource
+from routes.music_routes import MusicResource, AddMusic
 from routes.play_routes import PlayResource, Recommend
 from routes.feedback_routes import FeedbackResource
 from flask_restful import Api
@@ -17,6 +17,7 @@ api.add_resource(FaceResource, '/face/<string:face_id>')
 api.add_resource(FaceExamine, '/examine')
 
 api.add_resource(MusicResource, '/music/<string:music_id>')
+api.add_resource(AddMusic, '/add/music')
 
 api.add_resource(PlayResource, '/play/<string:play_id>')
 api.add_resource(Recommend, '/recommend')
