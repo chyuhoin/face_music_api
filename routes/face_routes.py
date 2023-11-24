@@ -4,6 +4,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from config import app, db
 from models.face import Face
 from utils.face_utils import ask_faceplus
+from sqlalchemy import func
+
 
 face_fields = {
     'id': fields.String,
@@ -60,6 +62,8 @@ class FaceExamine(Resource):
         parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files')
         args = parser.parse_args()
 
+        new_count = db.session.query(func.max(Face.count)).filter(Face.user == get_jwt_identity()).scalar() + 1
+
         face_img = args['file']
         result: dict = ask_faceplus(face_img.stream.read())
 
@@ -68,7 +72,7 @@ class FaceExamine(Resource):
 
         face = Face(
             user=get_jwt_identity(),
-            count=1,
+            count=new_count,
             score=json.dumps(result.get("faces")[0].get("attributes").get("emotion"))
         )
         db.session.add(face)

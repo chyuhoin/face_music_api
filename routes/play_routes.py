@@ -1,0 +1,50 @@
+import json
+from flask_restful import Resource, reqparse, fields, marshal_with
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from config import app, db
+from models.play import Play
+from sqlalchemy import func
+
+play_field = {
+    'id': fields.String,
+    'user': fields.String,
+    'count': fields.Integer,
+    'music': fields.Integer,
+    'skip': fields.Boolean
+}
+
+
+class PlayResource(Resource):
+    @marshal_with(play_field)
+    @jwt_required()
+    def get(self, play_id):
+        play = Play.query.get_or_404(play_id)
+        return play
+
+    @marshal_with(play_field)
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('music', type=int)
+        parser.add_argument('skip', type=bool)
+        args = parser.parse_args()
+
+        new_count = db.session.query(func.max(Play.count)).filter(Play.user == get_jwt_identity()).scalar() + 1
+
+        play = Play(
+            user=get_jwt_identity(),
+            count=new_count,
+            music=args['music'],
+            skip=args['skip']
+        )
+        db.session.add(play)
+        db.session.commit()
+        return play, 201
+
+
+class Recommend(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('emotion', type=str, required=True, help='Where is your emotion?')
+    args = parser.parse_args()
+    emotion = json.loads(args['emotion'])
+    # TODO: 方法一：记录每首歌的七维情感倾向，使用余弦相似度进行推荐； 方法二：记录每首歌的具体情感，选取最高的进行推荐
