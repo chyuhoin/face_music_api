@@ -95,6 +95,8 @@ class UserLogin(Resource):
             access_token = create_access_token(identity=current_user.id)
             return {
                 'message': 'Logged in as {}'.format(current_user.phone),
+                'nickname': current_user.nickname,
+                'uid': current_user.uid,
                 'access_token': access_token
             }
         else:

@@ -59,7 +59,7 @@ class FaceExamine(Resource):
     @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files')
+        parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files', required=True)
         args = parser.parse_args()
 
         new_count = db.session.query(func.max(Face.count)).filter(Face.user == get_jwt_identity()).scalar() + 1
