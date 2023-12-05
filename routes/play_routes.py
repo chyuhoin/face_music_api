@@ -10,6 +10,7 @@ from models.music import Music
 from sqlalchemy import func
 
 play_field = {
+    'message': fields.String,
     'id': fields.String,
     'user': fields.String,
     'count': fields.Integer,
@@ -33,7 +34,10 @@ class PlayResource(Resource):
         parser.add_argument('skip', type=bool)
         args = parser.parse_args()
 
-        new_count = db.session.query(func.max(Play.count)).filter(Play.user == get_jwt_identity()).scalar() + 1
+        new_count = db.session.query(func.max(Play.count)).filter(Play.user == get_jwt_identity()).scalar()
+        if new_count is None:
+            new_count = 0
+        new_count += 1
 
         play = Play(
             user=get_jwt_identity(),

@@ -4,6 +4,7 @@ from config import app, db
 from models.user import User
 
 user_fields = {
+    'message': fields.String,
     'id': fields.String,
     'phone': fields.String,
     'password': fields.String,

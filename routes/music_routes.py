@@ -5,6 +5,7 @@ from models.music import Music
 
 
 music_fields = {
+    'message': fields.String,
     'id': fields.Integer,
     'name': fields.String,
     'emotion': fields.String,

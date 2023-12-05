@@ -8,6 +8,7 @@ from sqlalchemy import func
 
 
 face_fields = {
+    'message': fields.String,
     'id': fields.String,
     'user': fields.String,
     'count': fields.Integer,
@@ -62,7 +63,10 @@ class FaceExamine(Resource):
         parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files', required=True)
         args = parser.parse_args()
 
-        new_count = db.session.query(func.max(Face.count)).filter(Face.user == get_jwt_identity()).scalar() + 1
+        new_count = db.session.query(func.max(Face.count)).filter(Face.user == get_jwt_identity()).scalar()
+        if new_count is None:
+            new_count = 0
+        new_count += 1
 
         face_img = args['file']
         result: dict = ask_faceplus(face_img.stream.read())
