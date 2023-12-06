@@ -13,7 +13,7 @@ face_fields = {
     'user': fields.String,
     'count': fields.Integer,
     'score': fields.String,
-    'gmt_create': fields.String(attribute=lambda x: x.gmt_create.strftime('%Y-%m-%d, %H:%M:%S'))
+    'gmt_create': fields.String
 }
 
 
@@ -71,8 +71,8 @@ class FaceExamine(Resource):
         face_img = args['file']
         result: dict = ask_faceplus(face_img.stream.read())
 
-        if result.get("faces") is None:
-            return {"Message: No face"}, 403
+        if not result.get("faces"):
+            return {"message: No face"}, 200
 
         face = Face(
             user=get_jwt_identity(),
