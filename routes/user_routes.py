@@ -22,7 +22,7 @@ user_fields = {
 def get_args(parser, is_new: bool):
     parser.add_argument('phone', type=str, required=is_new)
     parser.add_argument('password', type=str, required=is_new)
-    parser.add_argument('nickname', type=str)
+    parser.add_argument('nickname', type=str, required=is_new)
     parser.add_argument('age', type=int)
     parser.add_argument('gender', type=bool)
     parser.add_argument('address', type=str)
@@ -90,7 +90,7 @@ class UserLogin(Resource):
 
         current_user = User.query.filter_by(phone=data['phone']).first()
         if not current_user:
-            return {'message': 'User {} doesn\'t exist'.format(data['id'])}
+            return {'message': 'User doesn\'t exist'}
 
         if data['password'] == current_user.password:
             access_token = create_access_token(identity=current_user.id)
@@ -98,7 +98,31 @@ class UserLogin(Resource):
                 'message': 'Logged in as {}'.format(current_user.phone),
                 'nickname': current_user.nickname,
                 'uid': current_user.uid,
-                'access_token': access_token
+                'access_token': access_token,
+                'level': current_user.level
             }
         else:
             return {'message': 'Wrong credentials'}
+
+
+class UserList(Resource):
+    def get(self):
+        user_list = User.query.all()
+        res = []
+        for user in user_list:
+            cov = dict()
+            cov['id'] = str(user.id)
+            cov['phone'] = user.phone
+            cov['password'] = user.password
+            cov['nickname'] = user.nickname
+            cov['level'] = user.level
+            res.append(cov)
+        return res
+
+
+class MyInfo(Resource):
+    @jwt_required()
+    @marshal_with(user_fields)
+    def post(self):
+        user = User.query.get_or_404(get_jwt_identity())
+        return user

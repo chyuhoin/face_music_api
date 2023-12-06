@@ -1,5 +1,5 @@
 from config import app, db
-from routes.user_routes import UserRegistration, UserLogin, UserResource
+from routes.user_routes import UserRegistration, UserLogin, UserResource, UserList, MyInfo
 from routes.face_routes import FaceResource, FaceExamine
 from routes.music_routes import MusicResource, AddMusic
 from routes.play_routes import PlayResource, Recommend
@@ -12,6 +12,8 @@ api = Api(app)
 api.add_resource(UserRegistration, '/registration')
 api.add_resource(UserLogin, '/login')
 api.add_resource(UserResource, '/user/<string:user_id>')
+api.add_resource(UserList, '/userList')
+api.add_resource(MyInfo, '/myInfo')
 
 api.add_resource(FaceResource, '/face/<string:face_id>')
 api.add_resource(FaceExamine, '/examine')
