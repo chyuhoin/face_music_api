@@ -107,7 +107,7 @@ class UserLogin(Resource):
 
 class UserList(Resource):
     def get(self):
-        user_list = User.query.all()
+        user_list = User.query.order_by(User.id.asc()).all()
         res = []
         for user in user_list:
             cov = dict()
