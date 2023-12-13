@@ -83,4 +83,4 @@ class Recommend(Resource):
         sorted(best_music, key=lambda x: x[0], reverse=True)
         upper = max(len(best_music) // 10, 1)
         choice = random.randint(0, upper)
-        return {"recommend": best_music[choice][1].id}
+        return {"recommend": best_music[choice][1].id, "message": ""}
