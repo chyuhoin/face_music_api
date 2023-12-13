@@ -82,3 +82,19 @@ class FaceExamine(Resource):
         db.session.add(face)
         db.session.commit()
         return face, 201
+
+
+class FaceData(Resource):
+    @jwt_required()
+    def get(self):
+        all_face = Face.query.all()
+        count = dict()
+        total = 0
+        for face in all_face:
+            emotion = json.loads(face.score)
+            for key in emotion.keys():
+                total += emotion[key]
+                count[key] = emotion[key] + count.get(key, 0.0)
+        for key in count.keys():
+            count[key] /= total
+        return count
