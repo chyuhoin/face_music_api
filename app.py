@@ -3,7 +3,7 @@ from routes.user_routes import UserRegistration, UserLogin, UserResource, UserLi
 from routes.face_routes import FaceResource, FaceExamine, FaceData
 from routes.music_routes import MusicResource, AddMusic
 from routes.play_routes import PlayResource, Recommend
-from routes.feedback_routes import FeedbackResource, AddFeedback
+from routes.feedback_routes import FeedbackResource, AddFeedback, FeedbackList
 from flask_restful import Api
 
 api = Api(app)
@@ -27,6 +27,7 @@ api.add_resource(Recommend, '/recommend')
 
 api.add_resource(FeedbackResource, '/feedback/<string:feedback_id>')
 api.add_resource(AddFeedback, '/add/feedback')
+api.add_resource(FeedbackList, '/feedbackList')
 
 if __name__ == '__main__':
     db.create_all()

@@ -72,3 +72,18 @@ class AddFeedback(Resource):
         db.session.add(feedback)
         db.session.commit()
         return feedback, 201
+
+
+class FeedbackList(Resource):
+    def get(self):
+        feedback_list = Feedback.query.order_by(Feedback.id.asc()).all()
+        res = []
+        for feedback in feedback_list:
+            cov = dict()
+            cov['id'] = str(feedback.id)
+            cov['user'] = str(feedback.user)
+            cov['count'] = feedback.count
+            cov['score'] = feedback.score
+            cov['feedback'] = feedback.feedback
+            res.append(cov)
+        return res

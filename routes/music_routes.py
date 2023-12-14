@@ -58,10 +58,10 @@ class AddMusic(Resource):
     @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int)
-        parser.add_argument('name', type=str)
-        parser.add_argument('emotion', type=str)
-        parser.add_argument('style', type=str)
+        parser.add_argument('id', type=int, required=True)
+        parser.add_argument('name', type=str, required=True)
+        parser.add_argument('emotion', type=str, required=True)
+        parser.add_argument('style', type=str, required=True)
         args = parser.parse_args()
 
         music = Music(**args)
