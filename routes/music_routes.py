@@ -68,3 +68,12 @@ class AddMusic(Resource):
         db.session.add(music)
         db.session.commit()
         return music, 201
+
+
+class MusicIds(Resource):
+    def get(self):
+        music_list = Music.query.order_by(Music.id.asc()).all()
+        res = ""
+        for music in music_list:
+            res += str(music.id) + ','
+        return {"ids": res[0: -1]}
