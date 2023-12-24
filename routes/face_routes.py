@@ -98,3 +98,32 @@ class FaceData(Resource):
         for key in count.keys():
             count[key] /= total
         return count
+
+
+class FaceDay(Resource):
+    @jwt_required()
+    def get(self):
+        result = db.session.query(Face.gmt_create, func.string_agg(Face.score, '|')).group_by(Face.gmt_create).order_by(Face.gmt_create).all()
+        date_list = []
+        count_list = []
+        emotion_result = dict()
+        for rec in result:
+            date_list.append(str(rec[0]))
+            total = 0
+            count = dict()
+            emotion_list = rec[1].split('|')
+            for e in emotion_list:
+                print(e)
+                emotion = json.loads(e)
+                for key in emotion.keys():
+                    total += emotion[key]
+                    count[key] = emotion[key] + count.get(key, 0.0)
+            for key in count.keys():
+                count[key] = count[key] * 100 / total
+            count_list.append(count)
+        for cnt in count_list:
+            for key in cnt.keys():
+                if emotion_result.get(key) is None:
+                    emotion_result[key] = []
+                emotion_result[key].append(cnt[key])
+        return {'date': date_list, 'emotion': emotion_result}

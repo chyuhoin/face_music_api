@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse, fields, marshal_with
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from config import app, db
 from models.music import Music
+import json
 
 
 music_fields = {
@@ -77,3 +78,20 @@ class MusicIds(Resource):
         for music in music_list:
             res += str(music.id) + ','
         return {"ids": res[0: -1]}
+
+
+class MusicData(Resource):
+    @jwt_required()
+    def get(self):
+        all_music = Music.query.all()
+        count = dict()
+        total = 0
+        for music in all_music:
+            emotion = json.loads(music.emotion)
+            print(emotion)
+            for key in emotion.keys():
+                total += emotion[key]
+                count[key] = emotion[key] + count.get(key, 0.0)
+        for key in count.keys():
+            count[key] /= total
+        return count
