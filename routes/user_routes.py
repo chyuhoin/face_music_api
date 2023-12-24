@@ -2,6 +2,8 @@ from flask_restful import Resource, reqparse, fields, marshal_with
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from config import app, db
 from models.user import User
+from datetime import timedelta
+
 
 user_fields = {
     'message': fields.String,
@@ -93,7 +95,7 @@ class UserLogin(Resource):
             return {'message': 'User doesn\'t exist'}
 
         if data['password'] == current_user.password:
-            access_token = create_access_token(identity=current_user.id)
+            access_token = create_access_token(identity=current_user.id, expires_delta=timedelta(days=1))
             return {
                 'message': 'Logged in as {}'.format(current_user.phone),
                 'nickname': current_user.nickname,

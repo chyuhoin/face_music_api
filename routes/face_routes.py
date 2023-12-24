@@ -113,7 +113,6 @@ class FaceDay(Resource):
             count = dict()
             emotion_list = rec[1].split('|')
             for e in emotion_list:
-                print(e)
                 emotion = json.loads(e)
                 for key in emotion.keys():
                     total += emotion[key]
