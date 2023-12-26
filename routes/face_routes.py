@@ -103,7 +103,8 @@ class FaceData(Resource):
 class FaceDay(Resource):
     @jwt_required()
     def get(self):
-        result = db.session.query(Face.gmt_create, func.string_agg(Face.score, '|')).group_by(Face.gmt_create).order_by(Face.gmt_create).all()
+        result = db.session.query(Face.gmt_create, func.string_agg(Face.score, '|')).group_by(
+            Face.gmt_create).order_by(Face.gmt_create).all()
         date_list = []
         count_list = []
         emotion_result = dict()
@@ -126,3 +127,47 @@ class FaceDay(Resource):
                     emotion_result[key] = []
                 emotion_result[key].append(cnt[key])
         return {'date': date_list, 'emotion': emotion_result}
+
+
+class FaceUserData(Resource):
+    @jwt_required()
+    def get(self, op):
+        if op == 'all':
+            all_face = Face.query.filter_by(user=get_jwt_identity()).all()
+            count = dict()
+            total = 0
+            for face in all_face:
+                emotion = json.loads(face.score)
+                for key in emotion.keys():
+                    total += emotion[key]
+                    count[key] = emotion[key] + count.get(key, 0.0)
+            for key in count.keys():
+                count[key] /= total
+            return count
+        elif op == 'day':
+            result = db.session.query(Face.gmt_create, func.string_agg(Face.score, '|')).filter_by(
+                user=get_jwt_identity()).group_by(Face.gmt_create).order_by(Face.gmt_create).all()
+            date_list = []
+            count_list = []
+            emotion_result = dict()
+            for rec in result:
+                date_list.append(str(rec[0]))
+                total = 0
+                count = dict()
+                emotion_list = rec[1].split('|')
+                for e in emotion_list:
+                    emotion = json.loads(e)
+                    for key in emotion.keys():
+                        total += emotion[key]
+                        count[key] = emotion[key] + count.get(key, 0.0)
+                for key in count.keys():
+                    count[key] = count[key] * 100 / total
+                count_list.append(count)
+            for cnt in count_list:
+                for key in cnt.keys():
+                    if emotion_result.get(key) is None:
+                        emotion_result[key] = []
+                    emotion_result[key].append(cnt[key])
+            return {'date': date_list, 'emotion': emotion_result}
+        else:
+            return {'message': '404'}

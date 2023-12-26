@@ -1,6 +1,6 @@
 from config import app, db
 from routes.user_routes import UserRegistration, UserLogin, UserResource, UserList, MyInfo
-from routes.face_routes import FaceResource, FaceExamine, FaceData, FaceDay
+from routes.face_routes import FaceResource, FaceExamine, FaceData, FaceDay, FaceUserData
 from routes.music_routes import MusicResource, AddMusic, MusicIds, MusicData, MusicList, MusicSearch
 from routes.play_routes import PlayResource, Recommend
 from routes.feedback_routes import FeedbackResource, AddFeedback, FeedbackList
@@ -19,6 +19,7 @@ api.add_resource(FaceResource, '/face/<string:face_id>')
 api.add_resource(FaceExamine, '/examine')
 api.add_resource(FaceData, '/face/data')
 api.add_resource(FaceDay, '/face/day')
+api.add_resource(FaceUserData, '/face/user/<string:op>')
 
 api.add_resource(MusicResource, '/music/<string:music_id>')
 api.add_resource(AddMusic, '/add/music')
