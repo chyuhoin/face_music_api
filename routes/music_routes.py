@@ -95,3 +95,31 @@ class MusicData(Resource):
         for key in count.keys():
             count[key] /= total
         return count
+
+
+class MusicList(Resource):
+    def get(self):
+        music_list = Music.query.order_by(Music.id.asc()).all()
+        res = []
+        for music in music_list:
+            cov = dict()
+            cov['id'] = music.id
+            cov['name'] = music.name
+            e = json.loads(music.emotion)
+            cov['emotion'] = [e['anger'], e['disgust'], e['fear'], e['happiness'], e['neutral'], e['sadness'], e['surprise']]
+            res.append(cov)
+        return res
+
+
+class MusicSearch(Resource):
+    def get(self, music_name):
+        music_list = Music.query.filter(Music.name.like(f'%{music_name}%')).order_by(Music.id.asc()).all()
+        res = []
+        for music in music_list:
+            cov = dict()
+            cov['id'] = music.id
+            cov['name'] = music.name
+            e = json.loads(music.emotion)
+            cov['emotion'] = [e['anger'], e['disgust'], e['fear'], e['happiness'], e['neutral'], e['sadness'], e['surprise']]
+            res.append(cov)
+        return res
