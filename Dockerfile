@@ -13,4 +13,4 @@ RUN apt-get update \
 # 仅仅只是声明
 EXPOSE 5000
 # docker exec的时候执行
-CMD ["uwsgi", "--ini uswgi.ini"]
+CMD ["uwsgi --ini uswgi.ini"]
