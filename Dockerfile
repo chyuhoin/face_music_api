@@ -12,5 +12,3 @@ RUN apt-get update \
 && echo 'dockerfile build success ...'
 # 仅仅只是声明
 EXPOSE 5000
-# docker exec的时候执行
-CMD ["uwsgi --http :5000 --wsgi-file app.py --callable app"]
