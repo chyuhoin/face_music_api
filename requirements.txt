@@ -1,6 +1,6 @@
 flask
 flask_restful
-psycopg2
+psycopg2-binary
 flask_cors
 flask-jwt-extended
 flask-sqlalchemy
