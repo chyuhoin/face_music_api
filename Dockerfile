@@ -13,4 +13,4 @@ RUN apt-get update \
 # 仅仅只是声明
 EXPOSE 5000
 # docker exec的时候执行
-CMD ["uwsgi --ini /srv/face_music_api/uwsgi.ini"]
+CMD ["uwsgi --http :5000 --wsgi-file app.py --callable app"]
