@@ -8,9 +8,9 @@ RUN apt-get update \
 && apt-get install libxrender1 \
 && apt-get install libxext-dev \
 && pip install -r ./requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
-&& export FLASK_ENV = "development" \
+&& pip install uwsgi \
 && echo 'dockerfile build success ...'
 # 仅仅只是声明
 EXPOSE 5000
 # docker exec的时候执行
-CMD ["flask", "run"]
+CMD ["uwsgi", "--http :5000 --wsgi-file app.py --callable app"]
